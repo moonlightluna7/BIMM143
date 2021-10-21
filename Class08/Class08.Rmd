@@ -2,8 +2,7 @@
 title: "Machine Learning 1/PCA"
 author: "Jasmine Lee (PID: A15583527)"
 date: "10/21/2021"
-output:
-  pdf_document: default
+output: github_document
 ---
 
 First up is clustering methods
