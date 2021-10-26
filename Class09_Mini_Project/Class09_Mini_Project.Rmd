@@ -1,0 +1,208 @@
+---
+title: "Class 09: Machine Learning Mini-Project"
+author: "Jasmine Lee (PID: A15583527)"
+date: "10/26/2021"
+output: pdf_document
+---
+
+# Preparing the Data
+
+```{r}
+# Save your input data file into project directory
+fna.data <- "WisconsinCancer.csv"
+
+# Input the data and store as wisc.df
+wisc.df <- read.csv(fna.data, row.names=1)
+```
+
+```{r}
+# Check input data
+head(wisc.df)
+```
+
+```{r}
+# Remove diagnosis column
+wisc.data <- wisc.df[,-1]
+```
+
+```{r}
+# Create diagnosis vector for later
+diagnosis <- factor(wisc.df$diagnosis)
+```
+
+
+# Exploratory Data Analysis
+
+> **Q1**. How many observations are in this dataset?
+
+```{r}
+dim(wisc.data)
+```
+
+*Answer*: There are 569 observations in this dataset.
+
+
+> **Q2**. How many of the observations have a malignant diagnosis?
+
+```{r}
+length(grep("M", diagnosis))
+```
+
+*Answer*: There are 212 observations that have a malignant diagnosis.
+
+
+> **Q3**. How many variables/features in the data are suffixed with _mean?
+
+```{r}
+columns <- colnames(wisc.data)
+length(grep("_mean", columns))
+```
+
+*Answer*: There are 10 variables/features in the data that are suffixed with _mean.
+
+
+# Performing PCA
+
+```{r}
+# Check column means and standard deviations
+colMeans(wisc.data)
+apply(wisc.data, 2, sd)
+```
+
+```{r}
+# Perform PCA on wisc.data 
+wisc.pr <- prcomp(wisc.data, scale = TRUE)
+# Look at summary of results for wisc.pr
+summary(wisc.pr)
+```
+
+> **Q4**. From your results, what proportion of the original variance is captured by the first principal component (PC1)?
+
+*Answer*: From my results, 44.27% of the original variance is captured by the first principal component (PC1).
+
+
+> **Q5**. How many principal components (PCs) are required to describe at least 70% of the original variance in the data?
+
+*Answer*: Three principal components are required to describe at least 70% of the original variance in the data.
+
+
+> **Q6**. How many principal components (PCs) are required to describe at least 90% of the original variance in the data?
+
+*Answer*: Seven principal components are required to describe at least 90% of the original variance in the data.
+
+
+# Interpreting PCA Results
+
+```{r}
+# Create a biplot of the data
+biplot(wisc.pr)
+```
+
+> **Q7**. What stands to you about this plot? Is it easy or diffcult to understand? Why?
+
+*Answer*: It stands out to me that there is a plethora of data points with annotations based on rownames that lie on top of each other. The constant overlapping of data points and labels in the biplot makes it difficult to discern between the data for each variable/feature and analyze trends.
+
+
+```{r}
+# Scatter plot observations by components 1 and 2
+plot(wisc.pr$x[,1], wisc.pr$x[,2], col=diagnosis, xlab="PC1", ylab="PC2")
+```
+
+
+> **Q8**. Generate a similar plot for principal components 1 and 3. What do you notice about these plots?
+
+```{r}
+# Repeat for components 1 and 3
+plot(wisc.pr$x[,1], wisc.pr$x[,3], col=diagnosis, xlab="PC1", ylab="PC3")
+```
+ 
+*Answer*: I notice that both plots contain two groups, which correspond to the expected benign (black points) and malignant breast cells (red points). There appears to be less overlap and a clearer separation between the two groupings in the plot of PC1 vs. PC2 as compared to the plot of PC1 vs. PC3. This is due to the fact that PC2 accounts for a greater proportion of the original variance in the dataset than PC3. 
+ 
+
+```{r}
+# Create a data.frame for ggplot
+df <- as.data.frame(wisc.pr$x)
+df$diagnosis <- diagnosis
+
+# Load the ggplot2 package
+library(ggplot2)
+
+#Make a scatter plot colored by diagnosis
+ggplot(df) + aes(PC1, PC2, col=diagnosis) + geom_point()
+```
+
+
+# Variance Explained
+
+```{r}
+# Calculate variance of each component
+pr.var <- wisc.pr$sdev^2
+head(pr.var)
+```
+
+```{r}
+# Variance explained by each principal component: pve
+pve <- pr.var / sum(pr.var) 
+
+# Plot variance explained for each principal component
+plot(pve, xlab="Principal Component", ylab="Proportion of Variance Explained", ylim=c(0,1), type="o")
+```
+
+```{r}
+# Alternative scree plot of the same data; note data driven y-axis
+barplot(pve, ylab="Percent of Variance Explained", names.arg=paste0("PC", 1:length(pve)), las=2, axes=FALSE)
+axis(2, at=pve, labels=round(pve,2)*100)
+```
+
+```{r}
+# ggplot based graph
+#install.packages("factoextra")
+library(factoextra)
+fviz_eig(wisc.pr, addlabels=TRUE)
+```
+ 
+
+# Communicating PCA Results
+
+> **Q9**. For the first principal component, what is the component of the loading vector (i.e. wisc.pr$rotation[,1]) for the feature concave.points_mean?
+
+```{r}
+wisc.pr$rotation["concave.points_mean",1] 
+```
+
+*Answer*: The component of the loading vector for the feature concave.points_mean is -0.2608538.
+
+
+> **Q10**. What is the minimum number of principal components required to explain 80% of the variance of the data?
+
+```{r}
+summary(wisc.pr)
+```
+
+*Answer*: The minimum number of principal components required to explain 80% of the variance of the data is 5. 
+
+
+# Hierarchical Clustering
+
+```{r}
+# Scale the wisc.data data using the "scale()" function
+data.scaled <- scale(wisc.data)
+
+# Calculate Euclidean distances
+data.dist <- dist(data.scaled)
+
+# Create hierarchical clustering model
+wisc.hclust <- hclust(data.dist, method= "complete")
+```
+
+
+# Results of Hierarchical Clustering
+
+> **Q11**. Using the plot() and abline() functions, what is the height at which the clustering model has 4 clusters?
+
+```{r}
+plot(wisc.hclust)
+abline(wisc.hclust, col="red", lty=2)
+```
+
+*Answer*: 
