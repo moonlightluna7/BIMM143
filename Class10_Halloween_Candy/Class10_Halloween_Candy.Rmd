@@ -210,6 +210,38 @@ ord <- order(candy$pricepercent, decreasing=TRUE)
 head(candy[ord,c(11,12)], n=5)
 ```
 
+*Answer*: The top five most expensive candy types are Nik L Nip, Nestle Smarties, Ring pop, Hershey's Krackel, and Hershey's Milk Chocolate. Of these, Nik L Nip is the least popular. 
+
+
+> **Q21**. Make a barplot again with geom_col(), this time using pricepercent and then improve this step by step, first ordering the x-axis by value and finally making a so-called "dot chart" or "lollipop" chart by swapping geom_col() for geom_point() + geom_segment().
+
+```{r}
+ggplot(candy) +
+  aes(pricepercent, reorder(rownames(candy), pricepercent)) +
+  geom_segment(aes(yend = reorder(rownames(candy), pricepercent), 
+                   xend = 0), col="gray40") +
+    geom_point()
+```
+
+
+# 5. Exploring the correlation structure
+
+```{r}
+# install.packages("corrplot")
+library(corrplot)
+cij <- cor(candy)
+corrplot(cij)
+```
+
+> **Q22**. Examining this plot, what two variables are anti-correlated (i.e. have minus values)?
+
+*Answer*: Chocolate and fruity are anti-correlated.
+
+
+> **Q23**. Similarly, what two variables are most positively correlated?
+
+*Answer*: Each variable is most positively correlated to itself. For example, chocolate is most positively correlated to chocolate.
+
 
 # 6. Principal component analysis
 
@@ -222,3 +254,41 @@ summary(pca)
 plot(pca$x[,1], pca$x[,2])
 ```
 
+```{r}
+plot(pca$x[,1:2], col=my_cols, pch=16)
+```
+
+```{r}
+# Make a new data-frame with our PCA results and candy data
+my_data <- cbind(candy, pca$x[,1:3])
+```
+
+```{r}
+p <- ggplot(my_data) + 
+        aes(x=PC1, y=PC2, 
+            size=winpercent/100,  
+            text=rownames(my_data),
+            label=rownames(my_data)) +
+        geom_point(col=my_cols)
+p
+```
+
+```{r}
+library(ggrepel)
+
+p + geom_text_repel(size=3.3, col=my_cols, max.overlaps = 7)  + 
+  theme(legend.position = "none") +
+  labs(title="Halloween Candy PCA Space",
+       subtitle="Colored by type: chocolate bar (dark brown), chocolate other (light brown), fruity (red), other (black)",
+       caption="Data from 538")
+```
+
+```{r}
+# Take a look at PCA loadings
+par(mar=c(8, 4, 2, 2))
+barplot(pca$rotation[,1], las=2, ylab="PC1 Contribution")
+```
+
+> **Q24**. What original variables are picked up strongly by PC1 in the positive direction? Do these make sense to you?
+
+*Answer*: Fruity, hard, and pluribus are picked up strongly by PC1 in the positive direction. These make sense to me. 
