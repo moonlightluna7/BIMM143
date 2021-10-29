@@ -237,6 +237,11 @@ plot(hclust(data.dist, method= "ward.D2"))
 *Answer*: The 'ward.D2' method gives my favorite results for the same data.dist dataset because the data is presented in a clearer manner and is less skewed to one side.
 
 
+> **Q14**. How well does k-means separate the two diagnoses? How does it compare to your hclust results?
+
+*Answer*: Optional.
+
+
 # Combining Methods
 
 We take the results of our PCA analysis and cluster in this space 'wisc.pr$x'.
@@ -271,7 +276,7 @@ Cross table compare of diagnosis and my cluster groups.
 table(grps, diagnosis)
 ```
 
-*Answer*: The newly created model with four clusters separates out the two diagnoses better than the previous model.
+*Answer*: The newly created model with four clusters separates out the two diagnoses better than the previous hierarchial clustering model.
 
 
 ```{r}
@@ -281,6 +286,16 @@ plot(wisc.pr$x[,1:2], col=grps)
 ```{r}
 plot(wisc.pr$x[,1:2], col=diagnosis)
 ```
+
+
+> **Q16**. How well do the k-means (optional section) and hierarchical clustering models you created in previous sections (i.e. before PCA) do in terms of separating the diagnoses? Again, use the table() function to compare the output of each model with the vector containing the actual diagnoses.
+
+```{r}
+# Compare output of wisc.hclust.clusters with actual diagnosis
+table(wisc.hclust.clusters,diagnosis)
+```
+
+*Answer*: The hierarchical clustering model does not separate the diagnoses as well as the model created by combining hierarchical clustering with PCA. 
 
 
 # Sensitivity/Specificity
