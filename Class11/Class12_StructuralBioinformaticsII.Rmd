@@ -1,0 +1,119 @@
+---
+title: 'Class 12: Structural Bioinformatics II'
+author: 'Jasmine Lee (PID: A15583527)'
+date: "11/4/2021"
+output:
+  word_document: default
+  pdf_document: default
+---
+# Comparative Analysis of Protein Structures
+
+Using the Bio3D package
+```{r}
+library(bio3d)
+
+pdb <- read.pdb("1hel")
+pdb
+```
+
+Let's use a bioinformatics method called NMA (Normal Mode Analysis) to predict the dynamics (flexibility) of this enzyme.
+
+```{r}
+modes <- nma(pdb)
+plot(modes)
+```
+
+Make a "movie" of its predicted motion. We often call this a "trajectory".
+
+```{r}
+mktrj(modes, file="nma.pdb")
+```
+
+# VMD Visualization Image
+
+![](vmdmotion.png)
+
+# Analysis of ADK
+
+```{r}
+aa <- get.seq("1ake_A")
+aa
+```
+
+```{r}
+# Run BLAST from R
+blast <- blast.pdb(aa)
+```
+
+```{r}
+hits <- plot(blast)
+```
+
+```{r}
+hits$pdb.id
+```
+
+```{r}
+# Download related PDB files
+files <- get.pdb(hits$pdb.id, path="pdbs", split=TRUE, gzip=TRUE)
+```
+
+Multiple Structure Alignment
+```{r}
+pdbs <- pdbaln(files, fit=TRUE)
+```
+
+```{r}
+# Vector containing PDB codes for figure axis
+ids <- basename.pdb(pdbs$id)
+
+# Draw schematic alignment
+plot(pdbs, labels=ids)
+```
+
+# Viewing our superposed structures
+
+```{r}
+library(bio3d.view)
+library(rgl)
+
+view.pdbs(pdbs)
+```
+
+# Principal Component Analysis
+
+We will use the bio3d pca() function, which is designed for protein structure data.
+
+```{r}
+# Perform PCA
+pc.xray <- pca(pdbs)
+plot(pc.xray)
+```
+
+```{r}
+# Calculate RMSD
+rd <- rmsd(pdbs)
+
+# Structure-based clustering
+hc.rd <- hclust(dist(rd))
+grps.rd <- cutree(hc.rd, k=3)
+
+plot(pc.xray, 1:2, col="grey50", bg=grps.rd, pch=21, cex=1)
+```
+
+# Optional Further Visualization
+
+Make a trajectory visualization of the motion captured by the first Prinicpal Component.
+
+```{r}
+# Visualize first principal component
+pc1 <- mktrj(pc.xray, pc=1, file="pc_1.pdb")
+```
+
+# VMD Visualization Image
+
+![](vmdtrajectory.png)
+
+# Find-a-Gene VMD Visualization Image
+
+![](p53vmdscene.png)
