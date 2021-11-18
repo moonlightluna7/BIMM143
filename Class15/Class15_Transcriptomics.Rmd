@@ -216,6 +216,25 @@ res
 ```
 
 
+# Save Our Results
+
+Write out whole results dataset (including genes that don't change significantly).
+
+```{r}
+write.csv(res, file="allmyresults.csv")
+```
+
+Focus in on those genes with a small p-value (i.e. show a significant change).
+
+```{r}
+res05 <- results(dds, alpha=0.05)
+```
+
+```{r}
+summary(res05)
+```
+
+
 # Volcano Plots
 
 Let’s make a commonly produced visualization from this data, namely a so-called Volcano plot. These summary figures are frequently used to highlight the proportion of genes that are both significantly regulated and display a high fold change.
@@ -266,3 +285,144 @@ abline(v=c(-2,2), col="gray", lty=2)
 abline(h=-log(0.1), col="gray", lty=2)
 ```
 
+
+# Adding Annotation Data
+
+For this, we need two Bioconductor packages.
+
+```{r}
+library(AnnotationDbi)
+library(org.Hs.eg.db)
+```
+
+Let's have a loook at what is in the 'org.Hs.eg.db'.
+
+```{r}
+columns(org.Hs.eg.db)
+```
+
+We will use the 'mapIDs' function to translate between identifiers from different databases.
+
+```{r}
+res$symbol <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res), # Our genenames
+                     keytype="ENSEMBL",   # Their format
+                     column="SYMBOL",     # New format we want
+                     multiVals="first")
+```
+
+```{r}
+head(res)
+```
+
+
+> **Q11**. Run the **mapIds()* function two more times to add the Entrez ID and UniProt accession and GENENAME as new columns called res$entrez, res$uniprot, and res$genename.
+
+*Answer*:
+
+We need ENTREZ ids for pathway analysis with KEGG.
+
+```{r}
+res$entrez <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res), # Our genenames
+                     keytype="ENSEMBL",   # Their format
+                     column="ENTREZID",     # New format we want
+                     multiVals="first")
+```
+
+```{r}
+res$uniprot <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res), # Our genenames
+                     keytype="ENSEMBL",   # Their format
+                     column="UNIPROT",     # New format we want
+                     multiVals="first")
+```
+
+```{r}
+res$genename <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res), # Our genenames
+                     keytype="ENSEMBL",   # Their format
+                     column="GENENAME",     # New format we want
+                     multiVals="first")
+```
+
+
+Let's make another volcano plot with some gene labels.
+For this, we can use the **EnhancedVolcano** package.
+
+```{r}
+library(EnhancedVolcano)
+```
+
+```{r}
+x <- as.data.frame(res)
+
+EnhancedVolcano(x,
+    lab = x$symbol,
+    x = 'log2FoldChange',
+    y = 'pvalue')
+```
+
+
+# Pathway Analysis/Geneset Annotation
+
+```{r}
+library(pathview)
+library(gage)
+library(gageData)
+
+data(kegg.sets.hs)
+
+# Examine the first 2 pathways in this kegg set for humans
+head(kegg.sets.hs, 2)
+```
+
+The main **gage()** function requires a named vector of fold changes, where the names of the values are the Entrez gene IDs.
+
+```{r}
+foldchanges <- res$log2FoldChange
+names(foldchanges) <- res$entrez
+head(foldchanges)
+```
+
+```{r}
+# Get the results
+keggres = gage(foldchanges, gsets=kegg.sets.hs)
+```
+
+```{r}
+attributes(keggres)
+```
+
+This separates out results by "greater" and "less" (i.e. those that are upregulated and those that are downregulated).
+
+```{r}
+# Look at the first three down (less) pathways
+head(keggres$less, 3)
+```
+
+Now, let’s try out the 'pathview()' function from the **pathview** package to make a pathway plot with our RNA-Seq expression results shown in color.
+
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa05310")
+```
+
+
+![](hsa05310.pathview.png)
+
+
+> **Q12**. Can you do the same procedure as above to plot the pathview figures for the top 2 downregulated pathways?
+
+*Answer*: 
+
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa05332")
+```
+
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa04940")
+```
+
+![](hsa05332.pathview.png)
+
+![](hsa04940.pathview.png)
