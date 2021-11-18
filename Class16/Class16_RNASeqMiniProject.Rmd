@@ -298,3 +298,8 @@ write.table(sig_genes, file="significant_genes.txt", row.names=FALSE, col.names=
 *Answer*: The endosomal/vacuolar pathway has the most significant "Entities p-value" of 8.59E-4. The most significant pathways slightly differ from my previous KEGG results. The different extent of pathways documented in KEGG and Reactome could cause differences between the two methods. Moreover, the varying screening parameters of the two methods may contribute to differences.
 
 
+# GO Online (Optional)
+
+> **Q9**. What pathway has the most significant "Entities p-value"? Do the most significant pathways listed match your previous KEGG results? What factors could cause differences between the two methods?
+
+*Answer*: The biological process pathway has the most significant "Entities p-value" of 5.05E-64. The most significant pathways listed do not match my previous KEGG results. One factor contributing to these differences may be that our analysis using KEGG focused only on signaling and metabolic pathways. Furthermore, GO Online searches for both the overrepresented and underrepresented ontologies. 
