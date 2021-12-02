@@ -1,0 +1,32 @@
+---
+title: 'Class 13: UNIX'
+author: 'Jasmine Lee (PID:A15583527)'
+date: "11/9/21"
+output:
+  pdf_document: default
+---
+# UNIX
+
+```{r}
+col <- c("qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore")
+blast <- read.table("mm-second.x.zebrafish.tsv", col.names=col)
+```
+
+Make a histogram of $bitscore values.
+```{r}
+hist(blast$bitscore, breaks=30)
+```
+
+Make a nicer figure with ggplot.
+```{r}
+# install.packages("ggplot2")
+library(ggplot2)
+ggplot(blast, aes(pident, bitscore)) + geom_point(alpha=0.1)
+```
+
+```{r}
+ggplot(blast, aes((blast$pident * (blast$qend - blast$qstart)), bitscore)) +
+  geom_point(alpha=0.1) + 
+  geom_smooth()
+```
+
