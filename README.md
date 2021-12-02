@@ -3,7 +3,7 @@ Bioinformatics class at UC San Diego Fall 2021
 This is a showcase of my work in this class.
 
 ## Contents
-- Introduction to R 
+- Introduction to R [source](https://github.com/moonlightluna7/BIMM143/tree/main/Class04)
 - Data Visualization with ggplot2 [source](https://github.com/moonlightluna7/BIMM143/tree/main/Class05)
 - Machine Learning/PCA [source](https://github.com/moonlightluna7/BIMM143/tree/main/Class08)
 - Cancer Unsupervised Machine Learning Mini-Project [source](https://github.com/moonlightluna7/BIMM143/tree/main/Class09_Mini_Project)
