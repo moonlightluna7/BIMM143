@@ -1,0 +1,13 @@
+---
+title: 'Class 4: Introduction to R'
+author: 'Jasmine Lee (PID: A15583527)'
+date: "12/2/2021"
+output: github_document
+---
+# Class 4 Intro to R
+
+```{r}
+x <- 1:50
+plot(x, sin(x), type="l", col="blue", lwd=3, xlab="My nice text")
+```
+
