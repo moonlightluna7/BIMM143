@@ -15,3 +15,4 @@ Bioinformatics class at UC San Diego Fall 2021
 - Transcriptomics [source](https://github.com/moonlightluna7/BIMM143/tree/main/Class15)
 - RNA Seq Mini-Project [source](https://github.com/moonlightluna7/BIMM143/tree/main/Class16)
 - Vaccination Mini-Project [source](https://github.com/moonlightluna7/BIMM143/tree/main/Class17)
+- Genome Informatics [source](https://github.com/moonlightluna7/BIMM143/tree/main/Class19)
